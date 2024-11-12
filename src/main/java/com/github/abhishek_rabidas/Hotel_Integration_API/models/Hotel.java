@@ -14,4 +14,5 @@ public class Hotel extends BaseEntity {
     private String address;
     private Double rating;
     private int taxRate;
+    private boolean active = true;
 }
