@@ -35,8 +35,13 @@ public class HotelController {
         return ResponseEntity.ok(hotelService.fetchHotelDetails(id));
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/deactivate/{id}")
     public void archiveHotel(@PathVariable String id) {
-        hotelService.archiveHotel(id);
+        hotelService.changeHotelStatus(id, false);
+    }
+
+    @PutMapping("/activate/{id}")
+    public void makeHotelActive(@PathVariable String id) {
+        hotelService.changeHotelStatus(id, true);
     }
 }
