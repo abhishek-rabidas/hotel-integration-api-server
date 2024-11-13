@@ -1,10 +1,8 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.models;
 
+import com.github.abhishek_rabidas.Hotel_Integration_API.enums.BookingStatus;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,4 +33,7 @@ public class Booking extends BaseEntity {
     private Date bookingTo;
 
     private int pax;
+
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 }

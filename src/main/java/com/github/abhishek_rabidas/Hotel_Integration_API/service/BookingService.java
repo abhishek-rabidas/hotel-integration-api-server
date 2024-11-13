@@ -6,12 +6,14 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.dao.HotelRoomRepository
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.UserRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.BookingResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateBookingRequest;
+import com.github.abhishek_rabidas.Hotel_Integration_API.enums.BookingStatus;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.Booking;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.Hotel;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HotelRoom;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +117,7 @@ public class BookingService {
         booking.setBookingTo(bookingEndDate);
         booking.setPax(createBookingRequest.getPax());
         booking.setAmountPaid(createBookingRequest.getAmountPaid());
+        booking.setStatus(BookingStatus.CREATED);
         bookingRepository.save(booking);
 
         rooms.forEach(hotelRoom -> {
@@ -138,5 +141,31 @@ public class BookingService {
         }
 
         return bookings.stream().map(BookingResponse::new).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void cancelBooking(String id) {
+        Booking booking = bookingRepository.findByUuid(id);
+
+        if (booking == null) {
+            throw new NotFoundException("Booking details not found");
+        }
+
+        Date currentDate = new Date();
+
+        if (currentDate.getTime() > booking.getBookingFrom().getTime()) {
+            throw new ValidationException("You can't cancel the booking in between the stay tenure");
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+
+        List<HotelRoom> rooms = new ArrayList<>();
+        booking.getRooms().forEach(hotelRoom -> {
+            hotelRoom.setCurrentlyBooked(false);
+            hotelRoom.setBookedTill(null);
+            rooms.add(hotelRoom);
+        });
+        hotelRoomRepository.saveAll(rooms);
     }
 }

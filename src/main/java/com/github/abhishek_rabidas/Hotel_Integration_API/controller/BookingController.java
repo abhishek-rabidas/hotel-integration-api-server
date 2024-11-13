@@ -27,4 +27,9 @@ public class BookingController {
         return bookingService.getBookingsForUser(userId);
     }
 
+    @PutMapping("/cancel/{id}")
+    public void cancelBooking(@PathVariable String id) {
+        bookingService.cancelBooking(id);
+    }
+
 }
