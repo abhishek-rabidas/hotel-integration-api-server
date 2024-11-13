@@ -4,6 +4,7 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.dao.BookingRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.HotelRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.HotelRoomRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.UserRepository;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dto.BookingResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateBookingRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -91,5 +93,21 @@ public class BookingService {
         booking.setPax(createBookingRequest.getPax());
         booking.setAmountPaid(createBookingRequest.getAmountPaid());
         bookingRepository.save(booking);
+    }
+
+    public List<BookingResponse> getBookingsForUser(String userId) {
+        HrmsUser user = userRepository.findByUuid(userId);
+
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+
+        List<Booking> bookings = bookingRepository.findAllByUser(user);
+
+        if (bookings.isEmpty()) {
+            throw new NotFoundException("No bookings found");
+        }
+
+        return bookings.stream().map(BookingResponse::new).collect(Collectors.toList());
     }
 }
