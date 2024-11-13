@@ -2,7 +2,10 @@ package com.github.abhishek_rabidas.Hotel_Integration_API.controller;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateHotelRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.HotelResponse;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dto.PageResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.service.HotelService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,17 +25,18 @@ public class HotelController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllHotels() {
-        return null;
+    public ResponseEntity<PageResponse<HotelResponse>> getAllHotels(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Pageable paging = PageRequest.of(page, size);
+        return ResponseEntity.ok(hotelService.listHotels(paging));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getHotel(@PathVariable String id) {
-        return null;
+    public ResponseEntity<HotelResponse> getHotel(@PathVariable String id) {
+        return ResponseEntity.ok(hotelService.fetchHotelDetails(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> archiveHotel(@PathVariable String id) {
-        return null;
+    public void archiveHotel(@PathVariable String id) {
+        hotelService.archiveHotel(id);
     }
 }
