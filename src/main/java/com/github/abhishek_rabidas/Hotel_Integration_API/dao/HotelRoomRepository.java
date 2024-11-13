@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface HotelRoomRepository extends BaseRepository<HotelRoom, Long> {
     List<HotelRoom> findAllByHotel(Hotel hotel);
+    List<HotelRoom> findAllByUuidIn(List<String> list);
 }

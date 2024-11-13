@@ -11,7 +11,8 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationEx
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.Hotel;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HotelRoom;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class HotelService {
+    private static final Logger logger = LoggerFactory.getLogger(HotelService.class);
 
     private final HotelRepository hotelRepository;
     private final HotelRoomRepository hotelRoomRepository;
