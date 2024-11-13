@@ -21,4 +21,9 @@ public class HrmsUser extends BaseEntity {
 
     @Column(name = "phone", length = 32, nullable = true)
     private String phone;
+
+    @Column(length = 100, nullable = false)
+    private String firstName;
+
+    private String lastName;
 }
