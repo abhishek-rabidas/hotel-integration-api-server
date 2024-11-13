@@ -32,4 +32,13 @@ public class BookingController {
         bookingService.cancelBooking(id);
     }
 
+    @PostMapping("/checkIn/{id}")
+    public void checkIn(@PathVariable String id) {
+        bookingService.checkInBooking(id);
+    }
+
+    @PostMapping("/checkout/{id}")
+    public void checkout(@PathVariable String id) {
+        bookingService.cancelBooking(id);
+    }
 }

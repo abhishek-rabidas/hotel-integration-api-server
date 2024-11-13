@@ -43,7 +43,9 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
 
-    @Scheduled(cron = "0 0 0 * * ?") // Schedule to run every day at midnight (12:00 AM)
+    /*    Schedule to run every day at midnight (12:00 AM) to check for bookings
+        which have not been checked out successfully to release the rooms occupied*/
+    @Scheduled(cron = "0 0 0 * * ?")
     public void checkBookings() {
         Date currentDate = new Date();
         List<Booking> bookings = bookingRepository.findAllByBookingToLessThan(currentDate);
@@ -51,9 +53,11 @@ public class BookingService {
 
         bookings.forEach(booking -> {
             booking.getRooms().forEach(hotelRoom -> {
-                hotelRoom.setCurrentlyBooked(false);
-                hotelRoom.setBookedTill(null);
-                rooms.add(hotelRoom);
+                if (hotelRoom.isCurrentlyBooked()) {
+                    hotelRoom.setCurrentlyBooked(false);
+                    hotelRoom.setBookedTill(null);
+                    rooms.add(hotelRoom);
+                }
             });
         });
 
@@ -101,8 +105,8 @@ public class BookingService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         try {
-           bookingStartDate = simpleDateFormat.parse(createBookingRequest.getBookingFrom());
-           bookingEndDate = simpleDateFormat.parse(createBookingRequest.getBookingTo());
+            bookingStartDate = simpleDateFormat.parse(createBookingRequest.getBookingFrom());
+            bookingEndDate = simpleDateFormat.parse(createBookingRequest.getBookingTo());
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new ValidationException("Failed to parse details of booking start date and end date");
@@ -119,12 +123,6 @@ public class BookingService {
         booking.setAmountPaid(createBookingRequest.getAmountPaid());
         booking.setStatus(BookingStatus.CREATED);
         bookingRepository.save(booking);
-
-        rooms.forEach(hotelRoom -> {
-            hotelRoom.setCurrentlyBooked(true);
-            hotelRoom.setBookedTill(bookingEndDate);
-        });
-        hotelRoomRepository.saveAll(rooms);
     }
 
     public List<BookingResponse> getBookingsForUser(String userId) {
@@ -153,11 +151,63 @@ public class BookingService {
 
         Date currentDate = new Date();
 
+        if (!booking.getStatus().equals(BookingStatus.CREATED)) {
+            throw new ValidationException("You can't cancel the booking");
+        }
+
         if (currentDate.getTime() > booking.getBookingFrom().getTime()) {
             throw new ValidationException("You can't cancel the booking in between the stay tenure");
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+
+        List<HotelRoom> rooms = new ArrayList<>();
+        booking.getRooms().forEach(hotelRoom -> {
+            hotelRoom.setCurrentlyBooked(false);
+            hotelRoom.setBookedTill(null);
+            rooms.add(hotelRoom);
+        });
+        hotelRoomRepository.saveAll(rooms);
+    }
+
+    @Transactional
+    public void checkInBooking(String id) {
+        Booking booking = bookingRepository.findByUuid(id);
+
+        if (booking == null) {
+            throw new NotFoundException("Booking details not found");
+        }
+
+        if (!booking.getStatus().equals(BookingStatus.CREATED)) {
+            throw new ValidationException("You can't check-in at this moment");
+        }
+
+        booking.setStatus(BookingStatus.CHECKED_IN);
+        bookingRepository.save(booking);
+
+        List<HotelRoom> rooms = new ArrayList<>();
+        booking.getRooms().forEach(hotelRoom -> {
+            hotelRoom.setCurrentlyBooked(true);
+            hotelRoom.setBookedTill(booking.getBookingTo());
+            rooms.add(hotelRoom);
+        });
+        hotelRoomRepository.saveAll(rooms);
+    }
+
+    @Transactional
+    public void checkoutBooking(String id) {
+        Booking booking = bookingRepository.findByUuid(id);
+
+        if (booking == null) {
+            throw new NotFoundException("Booking details not found");
+        }
+
+        if (!booking.getStatus().equals(BookingStatus.CHECKED_IN)) {
+            throw new ValidationException("You can't check-out at this moment");
+        }
+
+        booking.setStatus(BookingStatus.CHECKED_OUT);
         bookingRepository.save(booking);
 
         List<HotelRoom> rooms = new ArrayList<>();
