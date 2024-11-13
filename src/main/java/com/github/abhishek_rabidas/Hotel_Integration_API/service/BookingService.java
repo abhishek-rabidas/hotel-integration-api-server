@@ -1,18 +1,12 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.service;
 
-import com.github.abhishek_rabidas.Hotel_Integration_API.dao.BookingRepository;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dao.HotelRepository;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dao.HotelRoomRepository;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dao.UserRepository;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dao.*;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.BookingResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateBookingRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.enums.BookingStatus;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
-import com.github.abhishek_rabidas.Hotel_Integration_API.models.Booking;
-import com.github.abhishek_rabidas.Hotel_Integration_API.models.Hotel;
-import com.github.abhishek_rabidas.Hotel_Integration_API.models.HotelRoom;
-import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
+import com.github.abhishek_rabidas.Hotel_Integration_API.models.*;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -42,6 +36,9 @@ public class BookingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BookingStatusHistoryRepository statusHistoryRepository;
 
     /*    Schedule to run every day at midnight (12:00 AM) to check for bookings
         which have not been checked out successfully to release the rooms occupied*/
@@ -123,6 +120,7 @@ public class BookingService {
         booking.setAmountPaid(createBookingRequest.getAmountPaid());
         booking.setStatus(BookingStatus.CREATED);
         bookingRepository.save(booking);
+        saveBookingStatus(booking, BookingStatus.CREATED);
     }
 
     public List<BookingResponse> getBookingsForUser(String userId) {
@@ -161,6 +159,7 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
+        saveBookingStatus(booking, BookingStatus.CANCELLED);
 
         List<HotelRoom> rooms = new ArrayList<>();
         booking.getRooms().forEach(hotelRoom -> {
@@ -185,6 +184,7 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.CHECKED_IN);
         bookingRepository.save(booking);
+        saveBookingStatus(booking, BookingStatus.CHECKED_IN);
 
         List<HotelRoom> rooms = new ArrayList<>();
         booking.getRooms().forEach(hotelRoom -> {
@@ -209,6 +209,7 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.CHECKED_OUT);
         bookingRepository.save(booking);
+        saveBookingStatus(booking, BookingStatus.CHECKED_OUT);
 
         List<HotelRoom> rooms = new ArrayList<>();
         booking.getRooms().forEach(hotelRoom -> {
@@ -217,5 +218,10 @@ public class BookingService {
             rooms.add(hotelRoom);
         });
         hotelRoomRepository.saveAll(rooms);
+    }
+
+    private void saveBookingStatus(Booking booking, BookingStatus status) {
+        BookingStatusHistory statusHistory = new BookingStatusHistory(booking, status);
+        statusHistoryRepository.save(statusHistory);
     }
 }
