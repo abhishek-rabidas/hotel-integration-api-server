@@ -6,6 +6,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @Getter
 @Setter
@@ -17,4 +19,5 @@ public class HotelRoom extends BaseEntity {
     private boolean isCurrentlyBooked;
     @ManyToOne
     private Hotel hotel;
+    private Date bookedTill;
 }

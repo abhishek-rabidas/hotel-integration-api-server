@@ -65,6 +65,10 @@ public class BookingService {
         }
 
         rooms.forEach(hotelRoom -> {
+            if (!hotelRoom.isCurrentlyBooked()) {
+                throw new ValidationException(hotelRoom.getRoomName() + " is already booked");
+            }
+
             if (!hotelRoom.getHotel().getUuid().equals(hotel.getUuid())) {
                 throw new ValidationException(hotelRoom.getRoomName() + " is not a room of " + hotel.getLegalName());
             }
@@ -93,6 +97,12 @@ public class BookingService {
         booking.setPax(createBookingRequest.getPax());
         booking.setAmountPaid(createBookingRequest.getAmountPaid());
         bookingRepository.save(booking);
+
+        rooms.forEach(hotelRoom -> {
+            hotelRoom.setCurrentlyBooked(true);
+            hotelRoom.setBookedTill(bookingEndDate);
+        });
+        hotelRoomRepository.saveAll(rooms);
     }
 
     public List<BookingResponse> getBookingsForUser(String userId) {
