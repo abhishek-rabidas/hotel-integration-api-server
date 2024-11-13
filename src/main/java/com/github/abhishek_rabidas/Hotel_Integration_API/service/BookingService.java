@@ -16,9 +16,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +40,23 @@ public class BookingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Scheduled(cron = "0 0 0 * * ?") // Schedule to run every day at midnight (12:00 AM)
+    public void checkBookings() {
+        Date currentDate = new Date();
+        List<Booking> bookings = bookingRepository.findAllByBookingToLessThan(currentDate);
+        List<HotelRoom> rooms = new ArrayList<>();
+
+        bookings.forEach(booking -> {
+            booking.getRooms().forEach(hotelRoom -> {
+                hotelRoom.setCurrentlyBooked(false);
+                hotelRoom.setBookedTill(null);
+                rooms.add(hotelRoom);
+            });
+        });
+
+        hotelRoomRepository.saveAll(rooms);
+    }
 
     public void createBooking(CreateBookingRequest createBookingRequest) {
         createBookingRequest.validate();
