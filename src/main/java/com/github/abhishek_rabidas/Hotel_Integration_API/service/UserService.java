@@ -1,5 +1,7 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.service;
 
+import com.github.abhishek_rabidas.Hotel_Integration_API.auth.HRMSAuthorization;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dao.PrivilegeRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.RoleRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.UserRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.AuthenticationResponse;
@@ -7,8 +9,11 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.dto.UserSignupRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.CurrentUser;
+import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.Privilege;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.Role;
 import com.github.abhishek_rabidas.Hotel_Integration_API.utils.PasswordUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,16 +24,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private PrivilegeRepository privilegeRepository;
 
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -38,13 +51,33 @@ public class UserService implements UserDetailsService {
 
     @PostConstruct
     public void init() {
+
+        List<String> privileges = HRMSAuthorization.privileges;
+        Set<Privilege> privilegeSet = new HashSet<>();
+        Set<Privilege> userPrivilegeSet = new HashSet<>();
+
+        for (String privilege : privileges) {
+            if (privilegeRepository.countByName(privilege) == 0) {
+                Privilege p = new Privilege();
+                p.setName(privilege);
+                privilegeRepository.saveAndFlush(p);
+                privilegeSet.add(p);
+                if (!privilege.contains("HOTEL_WRITE")) {
+                    userPrivilegeSet.add(p);
+                }
+                logger.info("Added {} to database", privilege);
+            }
+        }
+
         Role userRole = roleRepository.findAllByName("USER_ROLE");
         if (userRole == null) {
             userRole = new Role();
             userRole.setName("USER_ROLE");
             userRole.setExpireAfterHour(730); // 1month
+            userRole.setPrivileges(userPrivilegeSet);
             userRole = roleRepository.save(userRole);
             userLevelRole = userRole;
+            logger.info("Created USER_ROLE");
         }
         userLevelRole = userRole;
 
@@ -53,8 +86,10 @@ public class UserService implements UserDetailsService {
             adminRole = new Role();
             adminRole.setName("ADMIN_ROLE");
             adminRole.setExpireAfterHour(24); // 1 day
+            adminRole.setPrivileges(privilegeSet); // giving all the privileges
             adminRole = roleRepository.save(adminRole);
             adminLevelRole = adminRole;
+            logger.info("Created ADMIN_ROLE");
         }
         adminLevelRole = adminRole;
 
