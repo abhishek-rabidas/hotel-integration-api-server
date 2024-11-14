@@ -18,7 +18,7 @@
     </parent>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
         <springboot.version>2.7.4</springboot.version>
     </properties>
 

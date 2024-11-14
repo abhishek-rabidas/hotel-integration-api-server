@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class JwtFilter extends GenericFilterBean {
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
-    @Value("${secured.api.path}")
+    @Value("${secured.api.prefix.path}")
     private String apiprefix;
 
     @Value("${jwt.secret.key}")
