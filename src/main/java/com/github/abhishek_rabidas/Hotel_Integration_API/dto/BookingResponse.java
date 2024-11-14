@@ -17,7 +17,6 @@ public class BookingResponse extends Response {
     private Date bookingTo;
     private int pax;
     private HotelResponse hotelResponse;
-    private List<HotelRoomResponse> hotelRoomResponses;
     private List<BookingHistory> history;
 
     public BookingResponse(Booking booking) {
@@ -28,6 +27,6 @@ public class BookingResponse extends Response {
         this.bookingTo = booking.getBookingTo();
         this.pax = booking.getPax();
         this.hotelResponse = new HotelResponse(booking.getHotel());
-        this.hotelRoomResponses =  booking.getRooms().stream().map(HotelRoomResponse::new).collect(Collectors.toList());
+        this.hotelResponse.setRooms(booking.getRooms().stream().map(HotelRoomResponse::new).collect(Collectors.toList()));
     }
 }
