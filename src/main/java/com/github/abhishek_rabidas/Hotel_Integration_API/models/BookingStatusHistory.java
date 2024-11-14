@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -17,6 +19,7 @@ import javax.persistence.ManyToOne;
 public class BookingStatusHistory extends BaseEntity {
     @ManyToOne
     private Booking booking;
+    @Enumerated(EnumType.STRING)
     private BookingStatus status;
     private String remark;
 
