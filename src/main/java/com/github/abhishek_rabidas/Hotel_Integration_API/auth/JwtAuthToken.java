@@ -13,6 +13,9 @@ public class JwtAuthToken extends AbstractAuthenticationToken {
     //jwt token
     private final Object credentials;
 
+    @Getter
+    private boolean stale;
+
     @Override
     public Object getCredentials() {
         return credentials;

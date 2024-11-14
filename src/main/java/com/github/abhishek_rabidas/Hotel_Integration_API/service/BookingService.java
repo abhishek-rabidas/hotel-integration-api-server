@@ -7,7 +7,7 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.enums.BookingStatus;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.*;
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

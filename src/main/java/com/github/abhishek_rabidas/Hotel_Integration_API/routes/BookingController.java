@@ -1,4 +1,4 @@
-package com.github.abhishek_rabidas.Hotel_Integration_API.controller;
+package com.github.abhishek_rabidas.Hotel_Integration_API.routes;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.BookingResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateBookingRequest;

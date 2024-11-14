@@ -1,13 +1,13 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.models.core;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

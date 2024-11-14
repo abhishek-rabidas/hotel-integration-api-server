@@ -1,16 +1,13 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.models.core;
 
-import jakarta.persistence.*;
+
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.util.ProxyUtils;
 import org.springframework.lang.Nullable;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
 
 /**
  * Keeping everything same as org.springframework.data.jpa.domain.AbstractPersistable and changed the primary key generation type strategy

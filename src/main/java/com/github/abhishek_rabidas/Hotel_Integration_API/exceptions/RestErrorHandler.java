@@ -1,6 +1,6 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.exceptions;
 
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;

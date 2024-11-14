@@ -5,17 +5,20 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.dto.AuthenticationRespo
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.UserSignupRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
+import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.CurrentUser;
 import com.github.abhishek_rabidas.Hotel_Integration_API.utils.PasswordUtil;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Base64;
+import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -74,5 +77,14 @@ public class UserService {
             response.setMessage("No user found with " + email);
         }
         return response;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<HrmsUser> user = userRepository.findByEmail(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException(String.format("User was not found with email : %s", username));
+        }
+        return new CurrentUser(user.get(), new String[]{"ROLE_USER"});
     }
 }

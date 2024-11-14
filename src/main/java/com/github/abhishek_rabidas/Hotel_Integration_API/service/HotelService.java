@@ -10,7 +10,7 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundExce
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.Hotel;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HotelRoom;
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

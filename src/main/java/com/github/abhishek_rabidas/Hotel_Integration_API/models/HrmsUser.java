@@ -1,10 +1,17 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.models;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.Privilege;
+import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.Role;
+
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,4 +33,16 @@ public class HrmsUser extends BaseEntity {
     private String firstName;
 
     private String lastName;
+
+    @OneToOne
+    private Role role;
+
+    public Set<String> getPrivileges()
+    {
+        Set<String> privileges = new HashSet<>();
+        for (Privilege privilege : role.getPrivileges()) {
+            privileges.add(privilege.getName());
+        }
+        return privileges;
+    }
 }

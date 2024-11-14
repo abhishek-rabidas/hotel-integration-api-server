@@ -1,10 +1,9 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.models.core;
 
-import jakarta.persistence.*;
 import org.springframework.data.domain.Auditable;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.lang.Nullable;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

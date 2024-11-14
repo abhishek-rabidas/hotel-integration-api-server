@@ -2,7 +2,7 @@ package com.github.abhishek_rabidas.Hotel_Integration_API.models;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.enums.BookingStatus;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.BaseEntity;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,7 +1,7 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.models;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.BaseEntity;
-import jakarta.persistence.Entity;
+import javax.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
