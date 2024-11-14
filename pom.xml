@@ -12,7 +12,7 @@
 	<artifactId>Hotel-Integration-API</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Hotel-Integration-API</name>
-	<description>API Server for Hotel Management System</description>
+	<description>API Server for Hotel Reservation Management System</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -90,6 +90,11 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>32.1.3-jre</version> <!-- Replace with the latest version -->
 		</dependency>
 	</dependencies>
 
