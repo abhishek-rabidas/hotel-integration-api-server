@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
@@ -58,7 +59,8 @@ public class UserService {
 
         if (user.isPresent()) {
             if (user.get().isActive()) {
-                if (password.equals(user.get().getPasswordHash())) {
+                byte[] decodedBytes = Base64.getDecoder().decode(password);
+                if (new String(decodedBytes).equals(user.get().getPasswordHash())) {
                     response.setValidated(true);
                     response.setMessage("Login successful");
                 } else {
