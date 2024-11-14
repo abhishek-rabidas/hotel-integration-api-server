@@ -1,9 +1,11 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.service;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.*;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dto.BookingHistory;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.BookingResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateBookingRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.enums.BookingStatus;
+import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.AccessDeniedException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.*;
@@ -165,6 +167,10 @@ public class BookingService {
             throw new NotFoundException("Booking details not found");
         }
 
+        if (!validateBookingView(booking)) {
+            throw new AccessDeniedException("You are not allowed to view this booking");
+        }
+
         Date currentDate = new Date();
 
         if (!booking.getStatus().equals(BookingStatus.CREATED)) {
@@ -196,6 +202,10 @@ public class BookingService {
             throw new NotFoundException("Booking details not found");
         }
 
+        if (!validateBookingView(booking)) {
+            throw new AccessDeniedException("You are not allowed to view this booking");
+        }
+
         if (!booking.getStatus().equals(BookingStatus.CREATED)) {
             throw new ValidationException("You can't check-in at this moment");
         }
@@ -221,6 +231,10 @@ public class BookingService {
             throw new NotFoundException("Booking details not found");
         }
 
+        if (!validateBookingView(booking)) {
+            throw new AccessDeniedException("You are not allowed to view this booking");
+        }
+
         if (!booking.getStatus().equals(BookingStatus.CHECKED_IN)) {
             throw new ValidationException("You can't check-out at this moment");
         }
@@ -241,5 +255,41 @@ public class BookingService {
     private void saveBookingStatus(Booking booking, BookingStatus status) {
         BookingStatusHistory statusHistory = new BookingStatusHistory(booking, status);
         statusHistoryRepository.save(statusHistory);
+    }
+
+    public BookingResponse viewBookingDetails(String id) {
+        Booking booking = bookingRepository.findByUuid(id);
+
+        if (booking == null) {
+            throw new NotFoundException("Booking details not found");
+        }
+
+        if (!validateBookingView(booking)) {
+            throw new AccessDeniedException("You are not allowed to view this booking");
+        }
+
+        BookingResponse bookingResponse = new BookingResponse(booking);
+
+        List<BookingStatusHistory> statusHistories = statusHistoryRepository.findAllByBooking(booking);
+
+        List<BookingHistory> history = new ArrayList<>();
+
+        statusHistories.forEach(statusHistory -> {
+            history.add(new BookingHistory(statusHistory));
+        });
+
+        bookingResponse.setHistory(history);
+
+        return bookingResponse;
+    }
+
+    private boolean validateBookingView(Booking booking) {
+        HrmsUser user = getCurrentUser();
+
+        if (user == null) {
+            return false;
+        }
+
+        return booking.getCreatedBy().isPresent() && booking.getCreatedBy().get().getUuid().equals(user.getUuid());
     }
 }

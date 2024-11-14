@@ -35,6 +35,12 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getBookingsForUser(userId));
     }
 
+    @GetMapping("/view/{id}")
+    @Secured(BOOKING_READ)
+    public ResponseEntity<BookingResponse> viewBookingDetails(@PathVariable String id) {
+        return ResponseEntity.ok(bookingService.viewBookingDetails(id));
+    }
+
     @PutMapping("/cancel/{id}")
     @Secured(BOOKING_WRITE)
     public void cancelBooking(@PathVariable String id) {
@@ -50,6 +56,6 @@ public class BookingController {
     @PostMapping("/checkout/{id}")
     @Secured(BOOKING_WRITE)
     public void checkout(@PathVariable String id) {
-        bookingService.cancelBooking(id);
+        bookingService.checkoutBooking(id);
     }
 }

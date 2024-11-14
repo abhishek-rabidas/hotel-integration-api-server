@@ -16,26 +16,12 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 
     private static Logger logger = LoggerFactory.getLogger(RestErrorHandler.class);
 
-/*    @ExceptionHandler({AuthException.class})
-    public ResponseEntity<Object> handleAuthenticationError(Exception exception, WebRequest request) {
-        logger.warn("Auth error:", exception);
-        final ApiError apierror = message(HttpStatus.UNAUTHORIZED, exception);
-        return handleExceptionInternal(exception, apierror, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
-    }*/
-
-/*    @ExceptionHandler({AccessDeniedException.class})
+    @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAuthorisationError(Exception exception, WebRequest request) {
         logger.warn("Authorisation error:", exception);
         final ApiError apierror = message(HttpStatus.FORBIDDEN, exception);
         return handleExceptionInternal(exception, apierror, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }*/
-
-/*    @ExceptionHandler({RateException.class})
-    public ResponseEntity<Object> handleRateError(RateException exception, WebRequest request) {
-        logger.error("Auth error:", exception);
-        final ApiError apierror = message(HttpStatus.TOO_MANY_REQUESTS, exception);
-        return handleExceptionInternal(exception, apierror, new HttpHeaders(), HttpStatus.TOO_MANY_REQUESTS, request);
-    }*/
+    }
 
     @ExceptionHandler({NotFoundException.class, EntityNotFoundException.class})
     public ResponseEntity<Object> handleMissing(NotFoundException exception, WebRequest request) {
@@ -57,13 +43,6 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
         final ApiError apierror = message(HttpStatus.INTERNAL_SERVER_ERROR, exception);
         return handleExceptionInternal(exception, apierror, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
-
-/*    @ExceptionHandler({DataConflictException.class})
-    public ResponseEntity<Object> handleConflict(RuntimeException exception, WebRequest request) {
-        logger.error("ERROR:", exception);
-        final ApiError apierror = message(HttpStatus.CONFLICT, exception);
-        return handleExceptionInternal(exception, apierror, new HttpHeaders(), HttpStatus.CONFLICT, request);
-    }*/
 
     private ApiError message(final HttpStatus httpStatus, final Exception ex) {
         final String message = ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();

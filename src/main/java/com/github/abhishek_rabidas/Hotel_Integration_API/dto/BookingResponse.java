@@ -18,6 +18,7 @@ public class BookingResponse extends Response {
     private int pax;
     private HotelResponse hotelResponse;
     private List<HotelRoomResponse> hotelRoomResponses;
+    private List<BookingHistory> history;
 
     public BookingResponse(Booking booking) {
         this.setId(booking.getUuid());
