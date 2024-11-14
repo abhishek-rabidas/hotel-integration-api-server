@@ -2,10 +2,7 @@ package com.github.abhishek_rabidas.Hotel_Integration_API.service;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.HotelRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.HotelRoomRepository;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateHotelRequest;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dto.HotelResponse;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dto.HotelRoomResponse;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dto.PageResponse;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dto.*;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.Hotel;
@@ -17,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,5 +76,35 @@ public class HotelService {
 
         hotel.setActive(status);
         hotelRepository.save(hotel);
+    }
+
+    public HotelResponse addHotelRooms(HotelRoomCreateRequest request) {
+        Hotel hotel = hotelRepository.findByUuid(request.getHotelId());
+
+        if (hotel == null) {
+            throw new NotFoundException("Hotel not found");
+        }
+
+        if (!hotel.isActive()) {
+            throw new ValidationException("Hotel is not active");
+        }
+
+        List<HotelRoom> rooms = new ArrayList<>();
+
+        request.getRoomDetails().forEach(details -> {
+            HotelRoom hotelRoom = new HotelRoom();
+            hotelRoom.setHotel(hotel);
+            hotelRoom.setRoomName(details.getRoomName());
+            hotelRoom.setRoomIdentifier(details.getRoomIdentifier());
+            hotelRoom.setRoomDescription(details.getRoomDescription());
+            hotelRoom.setRoomPrice(details.getRoomPrice());
+            rooms.add(hotelRoom);
+        });
+
+
+        hotelRoomRepository.saveAll(rooms);
+        HotelResponse response = new HotelResponse(hotel);
+        response.setRooms(rooms.stream().map(HotelRoomResponse::new).collect(Collectors.toList()));
+        return response;
     }
 }

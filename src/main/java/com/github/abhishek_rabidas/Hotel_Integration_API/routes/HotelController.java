@@ -2,6 +2,7 @@ package com.github.abhishek_rabidas.Hotel_Integration_API.routes;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateHotelRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.HotelResponse;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dto.HotelRoomCreateRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.PageResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.service.HotelService;
 import org.springframework.data.domain.PageRequest;
@@ -52,5 +53,11 @@ public class HotelController {
     @Secured(HOTEL_WRITE)
     public void makeHotelActive(@PathVariable String id) {
         hotelService.changeHotelStatus(id, true);
+    }
+
+    @PostMapping("/addRooms")
+    @Secured(HOTEL_WRITE)
+    public ResponseEntity<HotelResponse> addHotelRooms(@RequestBody HotelRoomCreateRequest createRequest) {
+        return ResponseEntity.ok(hotelService.addHotelRooms(createRequest));
     }
 }
