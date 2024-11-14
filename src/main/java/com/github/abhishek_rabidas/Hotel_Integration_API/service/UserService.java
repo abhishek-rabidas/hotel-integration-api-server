@@ -56,7 +56,6 @@ public class UserService implements UserDetailsService {
 
     @PostConstruct
     public void init() {
-
         List<String> privileges = HRMSAuthorization.privileges;
         Set<Privilege> privilegeSet = new HashSet<>();
         Set<Privilege> userPrivilegeSet = new HashSet<>();
@@ -98,6 +97,22 @@ public class UserService implements UserDetailsService {
         }
         adminLevelRole = adminRole;
 
+        if (userRepository.findByEmail("superadmin@hrs.com").isEmpty()) {
+            createSuperAdminUser();
+        }
+    }
+
+    private void createSuperAdminUser() {
+        HrmsUser user = new HrmsUser();
+        user.setActive(true);
+        user.setFirstName("Abhishek");
+        user.setLastName("Kumar Rabidas");
+        user.setPhone("6207308977");
+        user.setEmail("superadmin@hrs.com");
+        user.setPasswordHash(encoder.encode("Password@121"));
+        user.setRole(adminLevelRole);
+        userRepository.saveAndFlush(user);
+        logger.info("Super admin account created with email : {} and password : {}", "superadmin@hrs.com", "Password@121");
     }
 
     public void signUp(UserSignupRequest request) {
