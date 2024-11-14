@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Setter
 public class BookingResponse extends Response {
     private String bookingId;
+    private String bookingStatus;
     private Double amountPaid;
     private Date bookingFrom;
     private Date bookingTo;
@@ -22,6 +23,7 @@ public class BookingResponse extends Response {
     public BookingResponse(Booking booking) {
         this.setId(booking.getUuid());
         this.bookingId = booking.getBookingId();
+        this.bookingStatus = booking.getStatus().name();
         this.amountPaid = booking.getAmountPaid();
         this.bookingFrom = booking.getBookingFrom();
         this.bookingTo = booking.getBookingTo();
