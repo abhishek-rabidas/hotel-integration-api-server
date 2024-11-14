@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +35,7 @@ public class HrmsUser extends BaseEntity {
 
     private String lastName;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Role role;
 
     public Set<String> getPrivileges()
