@@ -1,13 +1,18 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.service;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.UserRepository;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dto.AuthenticationResponse;
+import com.github.abhishek_rabidas.Hotel_Integration_API.dto.LoginRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.UserSignupRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
+import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -45,5 +50,29 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPasswordHash(request.getPassword()); // TODO: hash before saving
         userRepository.save(user);
+    }
+
+    public AuthenticationResponse authenticateUser(String email, String password) {
+        AuthenticationResponse response = new AuthenticationResponse();
+        Optional<HrmsUser> user = userRepository.findByEmail(email);
+
+        if (user.isPresent()) {
+            if (user.get().isActive()) {
+                if (password.equals(user.get().getPasswordHash())) {
+                    response.setValidated(true);
+                    response.setMessage("Login successful");
+                } else {
+                    response.setValidated(false);
+                    response.setMessage("Incorrect password");
+                }
+            } else {
+                response.setValidated(false);
+                response.setMessage("User account has been locked");
+            }
+        } else {
+            response.setValidated(false);
+            response.setMessage("No user found with " + email);
+        }
+        return response;
     }
 }
