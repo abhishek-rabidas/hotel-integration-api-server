@@ -1,11 +1,13 @@
 package com.github.abhishek_rabidas.Hotel_Integration_API.service;
 
+import com.github.abhishek_rabidas.Hotel_Integration_API.dao.RoleRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.UserRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.AuthenticationResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.UserSignupRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.CurrentUser;
+import com.github.abhishek_rabidas.Hotel_Integration_API.models.core.Role;
 import com.github.abhishek_rabidas.Hotel_Integration_API.utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,10 +27,36 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    private Role userLevelRole = null;
+
+    private Role adminLevelRole = null;
 
     @PostConstruct
     public void init() {
+        Role userRole = roleRepository.findAllByName("USER_ROLE");
+        if (userRole == null) {
+            userRole = new Role();
+            userRole.setName("USER_ROLE");
+            userRole.setExpireAfterHour(730); // 1month
+            userRole = roleRepository.save(userRole);
+            userLevelRole = userRole;
+        }
+        userLevelRole = userRole;
+
+        Role adminRole = roleRepository.findAllByName("ADMIN_ROLE");
+        if (adminRole == null) {
+            adminRole = new Role();
+            adminRole.setName("ADMIN_ROLE");
+            adminRole.setExpireAfterHour(24); // 1 day
+            adminRole = roleRepository.save(adminRole);
+            adminLevelRole = adminRole;
+        }
+        adminLevelRole = adminRole;
 
     }
 
@@ -56,6 +84,7 @@ public class UserService implements UserDetailsService {
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setPasswordHash(encoder.encode(PasswordUtil.convertBase64ToString(request.getPassword())));
+        user.setRole(userLevelRole);
         userRepository.save(user);
     }
 
