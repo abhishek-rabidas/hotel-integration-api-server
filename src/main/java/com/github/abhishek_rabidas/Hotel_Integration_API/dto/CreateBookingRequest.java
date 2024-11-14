@@ -12,8 +12,8 @@ import java.util.List;
 public class CreateBookingRequest {
     private String hotelId;
     private List<String> roomIds;
-    private String bookingFrom; //yyyy-dd-mm hh:mm:ss
-    private String bookingTo; //yyyy-dd-mm hh:mm:ss
+    private String bookingFrom; //yyyy-MM-dd hh:mm:ss
+    private String bookingTo; //yyyy-MM-dd hh:mm:ss
     private int pax;
     private Double amountPaid;
     private String userId;

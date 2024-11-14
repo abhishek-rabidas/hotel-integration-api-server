@@ -3,6 +3,7 @@ package com.github.abhishek_rabidas.Hotel_Integration_API.routes;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.BookingResponse;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.CreateBookingRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.service.BookingService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +25,14 @@ public class BookingController {
 
     @PostMapping
     @Secured(BOOKING_WRITE)
-    public void createBooking(@RequestBody CreateBookingRequest request) {
-        bookingService.createBooking(request);
+    public ResponseEntity<BookingResponse> createBooking(@RequestBody CreateBookingRequest request) {
+        return ResponseEntity.ok(bookingService.createBooking(request));
     }
 
     @GetMapping("/list/user")
     @Secured(BOOKING_READ)
-    public List<BookingResponse> getAllBookingsByUser(@RequestParam String userId) {
-        return bookingService.getBookingsForUser(userId);
+    public ResponseEntity<List<BookingResponse>> getAllBookingsByUser(@RequestParam(required = false) String userId) {
+        return ResponseEntity.ok(bookingService.getBookingsForUser(userId));
     }
 
     @PutMapping("/cancel/{id}")

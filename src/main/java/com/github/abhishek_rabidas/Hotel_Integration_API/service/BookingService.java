@@ -16,12 +16,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.github.abhishek_rabidas.Hotel_Integration_API.service.UserService.getCurrentUser;
 
 @Service
 public class BookingService {
@@ -70,10 +73,10 @@ public class BookingService {
         hotelRoomRepository.saveAll(rooms);
     }
 
-    public void createBooking(CreateBookingRequest createBookingRequest) {
+    public BookingResponse createBooking(CreateBookingRequest createBookingRequest) {
         createBookingRequest.validate();
 
-        HrmsUser user = userRepository.findByUuid(createBookingRequest.getUserId());
+        HrmsUser user = getCurrentUser();
 
         if (user == null) {
             throw new NotFoundException("User not found");
@@ -96,7 +99,7 @@ public class BookingService {
         }
 
         rooms.forEach(hotelRoom -> {
-            if (!hotelRoom.isCurrentlyBooked()) {
+            if (hotelRoom.isCurrentlyBooked()) {
                 throw new ValidationException(hotelRoom.getRoomName() + " is already booked");
             }
 
@@ -128,12 +131,18 @@ public class BookingService {
         booking.setPax(createBookingRequest.getPax());
         booking.setAmountPaid(createBookingRequest.getAmountPaid());
         booking.setStatus(BookingStatus.CREATED);
-        bookingRepository.save(booking);
+        booking = bookingRepository.save(booking);
         saveBookingStatus(booking, BookingStatus.CREATED);
+        return new BookingResponse(booking);
     }
 
     public List<BookingResponse> getBookingsForUser(String userId) {
-        HrmsUser user = userRepository.findByUuid(userId);
+        HrmsUser user;
+        if (StringUtils.hasLength(userId)) {
+            user = userRepository.findByUuid(userId);
+        } else {
+            user = getCurrentUser();
+        }
 
         if (user == null) {
             throw new NotFoundException("User not found");
