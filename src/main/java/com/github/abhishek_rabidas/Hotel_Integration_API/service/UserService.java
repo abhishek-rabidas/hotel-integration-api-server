@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -22,6 +24,8 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @PostConstruct
     public void init() {
@@ -51,7 +55,7 @@ public class UserService implements UserDetailsService {
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
-        user.setPasswordHash(PasswordUtil.convertBase64ToString(request.getPassword())); // TODO: hash before saving
+        user.setPasswordHash(encoder.encode(PasswordUtil.convertBase64ToString(request.getPassword())));
         userRepository.save(user);
     }
 
@@ -61,7 +65,7 @@ public class UserService implements UserDetailsService {
 
         if (user.isPresent()) {
             if (user.get().isActive()) {
-                if (PasswordUtil.convertBase64ToString(password).equals(user.get().getPasswordHash())) {
+                if (encoder.matches(PasswordUtil.convertBase64ToString(password), user.get().getPasswordHash())) {
                     response.setValidated(true);
                     response.setMessage("Login successful");
                 } else {
