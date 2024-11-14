@@ -2,11 +2,10 @@ package com.github.abhishek_rabidas.Hotel_Integration_API.service;
 
 import com.github.abhishek_rabidas.Hotel_Integration_API.dao.UserRepository;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.AuthenticationResponse;
-import com.github.abhishek_rabidas.Hotel_Integration_API.dto.LoginRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.dto.UserSignupRequest;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
-import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.HrmsUser;
+import com.github.abhishek_rabidas.Hotel_Integration_API.utils.PasswordUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +48,7 @@ public class UserService {
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
-        user.setPasswordHash(request.getPassword()); // TODO: hash before saving
+        user.setPasswordHash(PasswordUtil.convertBase64ToString(request.getPassword())); // TODO: hash before saving
         userRepository.save(user);
     }
 
@@ -59,8 +58,7 @@ public class UserService {
 
         if (user.isPresent()) {
             if (user.get().isActive()) {
-                byte[] decodedBytes = Base64.getDecoder().decode(password);
-                if (new String(decodedBytes).equals(user.get().getPasswordHash())) {
+                if (PasswordUtil.convertBase64ToString(password).equals(user.get().getPasswordHash())) {
                     response.setValidated(true);
                     response.setMessage("Login successful");
                 } else {
