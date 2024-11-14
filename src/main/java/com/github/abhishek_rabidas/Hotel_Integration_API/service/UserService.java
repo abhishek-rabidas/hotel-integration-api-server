@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -132,6 +129,7 @@ public class UserService implements UserDetailsService {
                 if (encoder.matches(PasswordUtil.convertBase64ToString(password), user.get().getPasswordHash())) {
                     response.setValidated(true);
                     response.setMessage("Login successful");
+                    response.setExpiresAt(expiryBuilder(user.get().getRole().getExpireAfterHour()));
                 } else {
                     response.setValidated(false);
                     response.setMessage("Incorrect password");
@@ -145,6 +143,13 @@ public class UserService implements UserDetailsService {
             response.setMessage("No user found with " + email);
         }
         return response;
+    }
+
+    private Date expiryBuilder(int hour) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.HOUR_OF_DAY, hour);
+        return calendar.getTime();
     }
 
     @Override
