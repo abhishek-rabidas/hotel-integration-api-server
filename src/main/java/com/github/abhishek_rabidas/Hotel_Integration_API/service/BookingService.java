@@ -7,7 +7,9 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.enums.BookingStatus;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.NotFoundException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.exceptions.ValidationException;
 import com.github.abhishek_rabidas.Hotel_Integration_API.models.*;
+
 import javax.transaction.Transactional;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,20 +27,27 @@ import java.util.stream.Collectors;
 public class BookingService {
     private static final Logger logger = LoggerFactory.getLogger(BookingService.class);
 
-    @Autowired
-    private BookingRepository bookingRepository;
+
+    private final BookingRepository bookingRepository;
+    private final HotelRepository hotelRepository;
+    private final HotelRoomRepository hotelRoomRepository;
+    private final UserRepository userRepository;
+    private final BookingStatusHistoryRepository statusHistoryRepository;
 
     @Autowired
-    private HotelRepository hotelRepository;
-
-    @Autowired
-    private HotelRoomRepository hotelRoomRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BookingStatusHistoryRepository statusHistoryRepository;
+    public BookingService(
+            BookingRepository bookingRepository,
+            HotelRepository hotelRepository,
+            HotelRoomRepository hotelRoomRepository,
+            UserRepository userRepository,
+            BookingStatusHistoryRepository statusHistoryRepository
+    ) {
+        this.bookingRepository = bookingRepository;
+        this.hotelRepository = hotelRepository;
+        this.hotelRoomRepository = hotelRoomRepository;
+        this.userRepository = userRepository;
+        this.statusHistoryRepository = statusHistoryRepository;
+    }
 
     /*    Schedule to run every day at midnight (12:00 AM) to check for bookings
         which have not been checked out successfully to release the rooms occupied*/

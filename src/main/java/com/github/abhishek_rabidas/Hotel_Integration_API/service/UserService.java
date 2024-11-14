@@ -31,14 +31,20 @@ public class UserService implements UserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PrivilegeRepository privilegeRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PrivilegeRepository privilegeRepository;
+    public UserService(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PrivilegeRepository privilegeRepository
+    ) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.privilegeRepository = privilegeRepository;
+    }
 
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
