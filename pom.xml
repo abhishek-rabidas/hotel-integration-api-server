@@ -6,7 +6,7 @@
 
     <groupId>com.github.abhishek-rabidas</groupId>
     <artifactId>Hotel-Integration-API</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>Hotel-Integration-API</name>
     <description>API Server for Hotel Reservation Management System</description>
     <packaging>jar</packaging>

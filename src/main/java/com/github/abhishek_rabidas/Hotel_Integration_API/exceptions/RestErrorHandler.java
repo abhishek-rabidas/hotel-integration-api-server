@@ -16,6 +16,8 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 
     private static Logger logger = LoggerFactory.getLogger(RestErrorHandler.class);
 
+    // Converting application exceptions to respective REST API Error message and HTTP status
+
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAuthorisationError(Exception exception, WebRequest request) {
         logger.warn("Authorisation error:", exception);
