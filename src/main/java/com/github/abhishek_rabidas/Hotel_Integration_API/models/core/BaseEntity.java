@@ -11,6 +11,8 @@ import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.github.abhishek_rabidas.Hotel_Integration_API.service.UserService.getCurrentUser;
+
 @MappedSuperclass
 @Getter
 @Setter
@@ -22,12 +24,18 @@ public abstract class BaseEntity extends LazyAuditable<HrmsUser, Long> {
     private void preCreate() {
         this.setUuid(UUID.randomUUID().toString());
         this.setCreatedDate(LocalDateTime.now());
-        // TODO: set created_by
+        HrmsUser currentUser = getCurrentUser();
+        if (currentUser != null) {
+            this.setCreatedBy(currentUser);
+        }
     }
 
     @PreUpdate
     private void preUpdate() {
         this.setLastModifiedDate(LocalDateTime.now());
-        // TODO: set modified_by
+        HrmsUser currentUser = getCurrentUser();
+        if (currentUser != null) {
+            this.setLastModifiedBy(currentUser);
+        }
     }
 }

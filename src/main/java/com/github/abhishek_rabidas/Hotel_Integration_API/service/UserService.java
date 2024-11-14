@@ -15,6 +15,8 @@ import com.github.abhishek_rabidas.Hotel_Integration_API.utils.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -165,5 +167,17 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException(String.format("User was not found with email : %s", username));
         }
         return new CurrentUser(user.get(), new String[]{"ROLE_USER"});
+    }
+
+    public static HrmsUser getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        if ((authentication.getPrincipal() instanceof CurrentUser)) {
+            return ((CurrentUser) authentication.getPrincipal()).getUser();
+        }
+        return null;
     }
 }
